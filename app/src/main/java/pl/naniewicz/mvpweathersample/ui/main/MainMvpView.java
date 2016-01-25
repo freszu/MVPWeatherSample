@@ -12,5 +12,5 @@ public interface MainMvpView extends MvpView {
 
     void showWeather(WeatherResponse weatherResponse);
 
-    void showError(Throwable throwable);
+    void showError(String string);
 }

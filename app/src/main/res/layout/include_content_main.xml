@@ -21,7 +21,8 @@
                 android:id="@+id/edit_text_city"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/hint_city"/>
+                android:hint="@string/hint_city"
+                android:singleLine="true"/>
         </android.support.design.widget.TextInputLayout>
 
         <Space
@@ -114,12 +115,12 @@
     </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_done"
+        android:id="@+id/fab_gps_based_forecast"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_margin="@dimen/fab_margin"
-        android:src="@drawable/fab_done"/>
+        android:src="@drawable/fab_gps_location"/>
 </RelativeLayout>

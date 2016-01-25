@@ -1,4 +1,4 @@
-package pl.naniewicz.mvpweathersample.data.api;
+package pl.naniewicz.mvpweathersample.data.remote;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -12,21 +12,21 @@ import rx.Observable;
 /**
  * Created by Rafał Naniewicz on 24.01.2016.
  */
-public class OpenWeatherApiManager {
+public class OpenWeatherMapApiManager {
     private static final String METRIC_UNITS = "metric";
 
-    private static OpenWeatherApiManager sInstance;
+    private static OpenWeatherMapApiManager sInstance;
 
     private OpenWeatherMapService mOpenWeatherMapService;
 
-    public static OpenWeatherApiManager getInstance() {
+    public static OpenWeatherMapApiManager getInstance() {
         if (sInstance == null) {
-            sInstance = new OpenWeatherApiManager();
+            sInstance = new OpenWeatherMapApiManager();
         }
         return sInstance;
     }
 
-    private OpenWeatherApiManager() {
+    private OpenWeatherMapApiManager() {
         mOpenWeatherMapService = getRetrofit().create(OpenWeatherMapService.class);
     }
 

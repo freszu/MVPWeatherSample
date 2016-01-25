@@ -1,7 +1,6 @@
 package pl.naniewicz.mvpweathersample.ui.main;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.Toolbar;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -40,6 +39,7 @@ public class MainActivity extends BaseActivity implements MainMvpView {
         setSupportActionBar(mToolbar);
         setupMainPresenter();
         mMainPresenter.startGpsService();
+        mMainPresenter.subscribeEditText(mEditTextCity);
     }
 
     private void setupMainPresenter() {
@@ -54,12 +54,13 @@ public class MainActivity extends BaseActivity implements MainMvpView {
     }
 
     @SuppressWarnings("unused")
-    @OnClick(R.id.fab_done)
+    @OnClick(R.id.fab_gps_based_forecast)
     public void onFabDoneClick() {
-        mMainPresenter.loadForecast(mEditTextCity.getText().toString());
+        mMainPresenter.loadGPSBasedForecast();
     }
 
-    @Override public void setRefreshingIndicator(boolean state) {
+    @Override
+    public void setRefreshingIndicator(boolean state) {
         if (state) {
             mTextStatus.setText(getString(R.string.loading));
         } else {
@@ -67,7 +68,8 @@ public class MainActivity extends BaseActivity implements MainMvpView {
         }
     }
 
-    @Override public void showWeather(WeatherResponse weatherResponse) {
+    @Override
+    public void showWeather(WeatherResponse weatherResponse) {
         Picasso.with(this)
                 .load(AddressBuilder.getIconAddress(weatherResponse.getWeather().get(0).getIcon()))
                 .fit()
@@ -80,7 +82,8 @@ public class MainActivity extends BaseActivity implements MainMvpView {
         mTextDescription.setText(StringFormatterUtil.getDescription(weatherResponse));
     }
 
-    @Override public void showError(Throwable throwable) {
-        mTextStatus.setText(throwable.getMessage());
+    @Override
+    public void showError(String errorMessage) {
+        mTextStatus.setText(errorMessage);
     }
 }

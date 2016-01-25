@@ -1,6 +1,6 @@
 package pl.naniewicz.mvpweathersample.data;
 
-import pl.naniewicz.mvpweathersample.data.api.OpenWeatherApiManager;
+import pl.naniewicz.mvpweathersample.data.remote.OpenWeatherMapApiManager;
 import pl.naniewicz.mvpweathersample.data.model.WeatherResponse;
 import rx.Observable;
 
@@ -9,17 +9,17 @@ import rx.Observable;
  */
 public class DataManager {
 
-    private OpenWeatherApiManager mOpenWeatherApiManager;
+    private OpenWeatherMapApiManager mOpenWeatherMapApiManager;
 
     public DataManager() {
-        mOpenWeatherApiManager = OpenWeatherApiManager.getInstance();
+        mOpenWeatherMapApiManager = OpenWeatherMapApiManager.getInstance();
     }
 
     public Observable<WeatherResponse> getWeatherWithObservable(String cityName) {
-        return mOpenWeatherApiManager.getWeatherWithObservable(cityName);
+        return mOpenWeatherMapApiManager.getWeatherWithObservable(cityName);
     }
 
     public Observable<WeatherResponse> getWeatherWithObservable(double latitude, double longitude) {
-        return mOpenWeatherApiManager.getWeatherWithObservable(latitude, longitude);
+        return mOpenWeatherMapApiManager.getWeatherWithObservable(latitude, longitude);
     }
 }
