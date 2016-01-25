@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">MVPWeatherSample</string>
+    <string name="hint_city">Insert city name here</string>
+    <string name="weather_icon">weather icon</string>
+    <string name="loading">loading...</string>
+</resources>
