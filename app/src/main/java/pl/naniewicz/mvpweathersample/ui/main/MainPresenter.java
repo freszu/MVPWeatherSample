@@ -42,8 +42,8 @@ public class MainPresenter extends BasePresenter<MainMvpView> {
                 .filter(charSequence -> charSequence.length() > 0)
                 .switchMap(charSequence -> mDataManager.getWeatherWithObservable(charSequence.toString())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .unsubscribeOn(Schedulers.newThread()))
-                .onErrorResumeNext(Observable.empty())
+                        .unsubscribeOn(Schedulers.newThread())
+                        .onErrorResumeNext(Observable.empty()))
                 .subscribe(
                         openWeatherMapResponse -> {
                             if (openWeatherMapResponse.getCode() == 200) {
