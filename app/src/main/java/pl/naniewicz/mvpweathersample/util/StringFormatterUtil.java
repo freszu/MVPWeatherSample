@@ -1,5 +1,8 @@
 package pl.naniewicz.mvpweathersample.util;
 
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+
 import pl.naniewicz.mvpweathersample.data.model.WeatherResponse;
 
 /**

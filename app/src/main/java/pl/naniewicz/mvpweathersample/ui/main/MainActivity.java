@@ -1,6 +1,7 @@
 package pl.naniewicz.mvpweathersample.ui.main;
 
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.Toolbar;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -22,7 +23,7 @@ public class MainActivity extends BaseActivity implements MainMvpView {
 
     @Bind(R.id.toolbar) Toolbar mToolbar;
 
-    @Bind(R.id.edit_text_city) EditText mEditTextCity;
+    @Bind(R.id.edit_text_location) EditText mEditTextLocation;
     @Bind(R.id.text_status) TextView mTextStatus;
 
     @Bind(R.id.image_weather_icon) ImageView mImageWeatherIcon;
@@ -31,6 +32,7 @@ public class MainActivity extends BaseActivity implements MainMvpView {
     @Bind(R.id.text_temperature_max) TextView mTextTemperatureMax;
     @Bind(R.id.text_temperature_min) TextView mTextTemperatureMin;
     @Bind(R.id.text_description) TextView mTextDescription;
+    @Bind(R.id.fab_gps_based_forecast) FloatingActionButton mFAB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,13 +40,25 @@ public class MainActivity extends BaseActivity implements MainMvpView {
         setContentView(R.layout.activity_main);
         setSupportActionBar(mToolbar);
         setupMainPresenter();
-        mMainPresenter.startGpsService();
-        mMainPresenter.subscribeEditText(mEditTextCity);
+        mMainPresenter.subscribeEditText(mEditTextLocation);
+        mFAB.hide();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mMainPresenter.startGpsService(this);
     }
 
     private void setupMainPresenter() {
         mMainPresenter = new MainPresenter();
         mMainPresenter.attachView(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mMainPresenter.stopGpsService();
     }
 
     @Override
@@ -55,7 +69,7 @@ public class MainActivity extends BaseActivity implements MainMvpView {
 
     @SuppressWarnings("unused")
     @OnClick(R.id.fab_gps_based_forecast)
-    public void onFabDoneClick() {
+    public void onFabGpsClick() {
         mMainPresenter.loadGPSBasedForecast();
     }
 
@@ -85,5 +99,12 @@ public class MainActivity extends BaseActivity implements MainMvpView {
     @Override
     public void showError(String errorMessage) {
         mTextStatus.setText(errorMessage);
+    }
+
+    @Override
+    public void showLocationFab() {
+        if(!mFAB.isShown()){
+            mFAB.show();
+        }
     }
 }

@@ -13,4 +13,7 @@ public interface MainMvpView extends MvpView {
     void showWeather(WeatherResponse weatherResponse);
 
     void showError(String string);
+
+    void showLocationFab();
+
 }
