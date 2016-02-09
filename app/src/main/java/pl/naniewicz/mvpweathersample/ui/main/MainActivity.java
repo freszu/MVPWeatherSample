@@ -6,6 +6,7 @@ import android.support.v7.widget.Toolbar;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -14,7 +15,7 @@ import butterknife.OnClick;
 import pl.naniewicz.mvpweathersample.R;
 import pl.naniewicz.mvpweathersample.data.model.WeatherResponse;
 import pl.naniewicz.mvpweathersample.ui.base.BaseActivity;
-import pl.naniewicz.mvpweathersample.util.AddressBuilder;
+import pl.naniewicz.mvpweathersample.util.AddressBuilderUtil;
 import pl.naniewicz.mvpweathersample.util.StringFormatterUtil;
 
 public class MainActivity extends BaseActivity implements MainMvpView {
@@ -25,7 +26,6 @@ public class MainActivity extends BaseActivity implements MainMvpView {
 
     @Bind(R.id.edit_text_location) EditText mEditTextLocation;
     @Bind(R.id.text_status) TextView mTextStatus;
-
     @Bind(R.id.image_weather_icon) ImageView mImageWeatherIcon;
     @Bind(R.id.text_place) TextView mTextPlace;
     @Bind(R.id.text_temperature) TextView mTextTemperature;
@@ -85,7 +85,7 @@ public class MainActivity extends BaseActivity implements MainMvpView {
     @Override
     public void showWeather(WeatherResponse weatherResponse) {
         Picasso.with(this)
-                .load(AddressBuilder.getIconAddress(weatherResponse.getWeather().get(0).getIcon()))
+                .load(AddressBuilderUtil.getIconAddress(weatherResponse.getWeather().get(0).getIcon()))
                 .fit()
                 .centerCrop()
                 .into(mImageWeatherIcon);
@@ -98,12 +98,12 @@ public class MainActivity extends BaseActivity implements MainMvpView {
 
     @Override
     public void showError(String errorMessage) {
-        mTextStatus.setText(errorMessage);
+        Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void showLocationFab() {
-        if(!mFAB.isShown()){
+        if (!mFAB.isShown()) {
             mFAB.show();
         }
     }

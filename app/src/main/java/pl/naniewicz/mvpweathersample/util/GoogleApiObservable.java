@@ -13,12 +13,12 @@ import rx.Subscriber;
 /**
  * Created by Rafał Naniewicz on 07.02.2016.
  */
-public class GoogleApiClientObservable implements Observable.OnSubscribe<GoogleApiClient>, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
+public class GoogleApiObservable implements Observable.OnSubscribe<GoogleApiClient>, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
 
     private final GoogleApiClient mGoogleApiClient;
     private Subscriber<? super GoogleApiClient> mSubscriber;
 
-    public GoogleApiClientObservable(Context context) {
+    public GoogleApiObservable(Context context) {
         mGoogleApiClient = new GoogleApiClient.Builder(context)
                 .addOnConnectionFailedListener(this)
                 .addConnectionCallbacks(this)

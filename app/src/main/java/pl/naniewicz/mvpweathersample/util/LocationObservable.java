@@ -16,16 +16,16 @@ import rx.subscriptions.Subscriptions;
 /**
  * Created by Rafał Naniewicz on 07.02.2016.
  */
-public class LocationObsevable implements LocationListener, Action0, Observable.OnSubscribe<Location> {
+public class LocationObservable implements LocationListener, Action0, Observable.OnSubscribe<Location> {
 
     private final LocationRequest mLocationRequest;
     private final GoogleApiClient mGoogleApiClient;
     private Subscriber<? super Location> mSubscriber;
 
-    public LocationObsevable(GoogleApiClient googleApiClient,
-                             long fastestUpdateIntervalMilliSecs,
-                             long updateIntervalMilliSecs,
-                             int locationRequestPriority) {
+    public LocationObservable(GoogleApiClient googleApiClient,
+                              long fastestUpdateIntervalMilliSecs,
+                              long updateIntervalMilliSecs,
+                              int locationRequestPriority) {
         mGoogleApiClient = googleApiClient;
         mLocationRequest = new LocationRequest()
                 .setFastestInterval(fastestUpdateIntervalMilliSecs)

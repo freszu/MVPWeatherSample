@@ -5,7 +5,11 @@ import pl.naniewicz.mvpweathersample.Constants;
 /**
  * Created by Rafal on 2015-07-14.
  */
-public class AddressBuilder {
+public class AddressBuilderUtil {
+
+    private AddressBuilderUtil() {
+        throw new AssertionError();
+    }
 
     public static String getIconAddress(String iconName) {
         if (iconName != null) {

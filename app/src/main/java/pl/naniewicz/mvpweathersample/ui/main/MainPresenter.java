@@ -13,6 +13,8 @@ import java.util.concurrent.TimeUnit;
 
 import pl.naniewicz.mvpweathersample.data.DataManager;
 import pl.naniewicz.mvpweathersample.ui.base.BasePresenter;
+import pl.naniewicz.mvpweathersample.util.GoogleApiObservable;
+import pl.naniewicz.mvpweathersample.util.RxUtil;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -79,9 +81,11 @@ public class MainPresenter extends BasePresenter<MainMvpView> {
                         LocationRequest.PRIORITY_HIGH_ACCURACY)
                         .subscribe(
                                 location -> {
-                                    Log.i("Location", location.toString());
                                     getMvpView().showLocationFab();
                                     mLatestLocation = location;
+                                },
+                                throwable -> {
+                                    getMvpView().showError(throwable.getMessage());
                                 }
                         );
     }
@@ -97,9 +101,7 @@ public class MainPresenter extends BasePresenter<MainMvpView> {
         getMvpView().setRefreshingIndicator(true);
         mSubscriptions.add(mDataManager.getWeatherWithObservable(mLatestLocation.getLatitude(),
                 mLatestLocation.getLongitude())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .unsubscribeOn(Schedulers.newThread())
+                .compose(RxUtil.applySchedulers())
                 .onErrorResumeNext(throwable -> {
                     getMvpView().showError(throwable.getMessage());
                     return Observable.empty();

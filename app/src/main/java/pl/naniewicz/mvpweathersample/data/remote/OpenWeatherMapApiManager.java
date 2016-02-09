@@ -2,6 +2,7 @@ package pl.naniewicz.mvpweathersample.data.remote;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
+import pl.naniewicz.mvpweathersample.BuildConfig;
 import pl.naniewicz.mvpweathersample.Constants;
 import pl.naniewicz.mvpweathersample.data.model.WeatherResponse;
 import retrofit2.GsonConverterFactory;
@@ -41,7 +42,8 @@ public class OpenWeatherMapApiManager {
 
     private OkHttpClient getOkHttpClient() {
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        interceptor.setLevel(BuildConfig.DEBUG ? HttpLoggingInterceptor.Level.BODY
+                : HttpLoggingInterceptor.Level.NONE);
         return new OkHttpClient.Builder().addInterceptor(interceptor).build();
     }
 

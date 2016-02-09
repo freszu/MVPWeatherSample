@@ -8,7 +8,11 @@ import pl.naniewicz.mvpweathersample.data.model.WeatherResponse;
 /**
  * Created by Rafał Naniewicz on 24.01.2016.
  */
-public class StringFormatterUtil {
+public final class StringFormatterUtil {
+
+    private StringFormatterUtil() {
+        throw new AssertionError();
+    }
 
     public static String getPlace(WeatherResponse weatherResponse) {
         StringBuilder stringBuilder = new StringBuilder(weatherResponse.getName());
