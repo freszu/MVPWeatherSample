@@ -1,7 +1,13 @@
 package pl.naniewicz.mvpweathersample.ui.main;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.Toolbar;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -41,13 +47,6 @@ public class MainActivity extends BaseActivity implements MainMvpView {
         setSupportActionBar(mToolbar);
         setupMainPresenter();
         mMainPresenter.subscribeEditText(mEditTextLocation);
-        mFAB.hide();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mMainPresenter.startGpsService(this);
     }
 
     private void setupMainPresenter() {
@@ -56,8 +55,28 @@ public class MainActivity extends BaseActivity implements MainMvpView {
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    protected void onStart() {
+        super.onStart();
+        mFAB.hide();
+        mMainPresenter.startLocationService(this);
+    }
+
+
+    @Override
+    public void compatRequestPermissions(int requestCode, String... permissions) {
+        ActivityCompat.requestPermissions(this, permissions, requestCode);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        mMainPresenter.handlePermissionResult(this, requestCode, grantResults);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
         mMainPresenter.stopGpsService();
     }
 
@@ -102,9 +121,35 @@ public class MainActivity extends BaseActivity implements MainMvpView {
     }
 
     @Override
+    public void showApiError(String apiError) {
+        mTextStatus.setText(apiError);
+    }
+
+    @Override
     public void showLocationFab() {
         if (!mFAB.isShown()) {
             mFAB.show();
         }
     }
+
+    @Override
+    public void showNoLocationPermissionSnackbar() {
+        Snackbar snackbar = Snackbar.make(findViewById(R.id.coordinatorLayout),
+                R.string.no_location_permission_warning,
+                Snackbar.LENGTH_INDEFINITE)
+                .setAction(R.string.settings,
+                        onClick -> {
+                            goToAppSettings();
+                        });
+        snackbar.show();
+    }
+
+    private void goToAppSettings() {
+        Intent intent = new Intent();
+        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                .addCategory(Intent.CATEGORY_DEFAULT)
+                .setData(Uri.parse("package:" + getPackageName()));
+        startActivity(intent);
+    }
+
 }

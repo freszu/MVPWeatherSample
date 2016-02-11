@@ -1,7 +1,5 @@
 package pl.naniewicz.mvpweathersample.ui.base;
 
-import android.widget.EditText;
-
 /**
  * Created by Rafał Naniewicz on 22.01.2016.
  */

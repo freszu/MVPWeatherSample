@@ -14,11 +14,12 @@ import rx.Observable;
  * Created by Rafał Naniewicz on 24.01.2016.
  */
 public class OpenWeatherMapApiManager {
+
     private static final String METRIC_UNITS = "metric";
 
     private static OpenWeatherMapApiManager sInstance;
 
-    private OpenWeatherMapService mOpenWeatherMapService;
+    private final OpenWeatherMapService mOpenWeatherMapService;
 
     public static OpenWeatherMapApiManager getInstance() {
         if (sInstance == null) {
@@ -59,6 +60,4 @@ public class OpenWeatherMapApiManager {
                 METRIC_UNITS,
                 Constants.API_KEY);
     }
-
-
 }

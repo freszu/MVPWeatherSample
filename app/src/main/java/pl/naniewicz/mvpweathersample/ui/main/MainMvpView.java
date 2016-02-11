@@ -8,12 +8,17 @@ import pl.naniewicz.mvpweathersample.ui.base.MvpView;
  */
 public interface MainMvpView extends MvpView {
 
+    void compatRequestPermissions(int requestCode, String... permissions);
+
     void setRefreshingIndicator(boolean state);
 
     void showWeather(WeatherResponse weatherResponse);
 
-    void showError(String string);
+    void showError(String locationString);
+
+    void showApiError(String apiError);
 
     void showLocationFab();
 
+    void showNoLocationPermissionSnackbar();
 }

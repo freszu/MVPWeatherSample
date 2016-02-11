@@ -2,5 +2,7 @@
     <string name="app_name">MVPWeatherSample</string>
     <string name="hint_city">Insert city name here</string>
     <string name="weather_icon">weather icon</string>
-    <string name="loading">loading...</string>
+    <string name="loading">loading…</string>
+    <string name="no_location_permission_warning">Location based broadcast can\'t function without location permission</string>
+    <string name="settings">Settings</string>
 </resources>
