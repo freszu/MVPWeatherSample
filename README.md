@@ -2,6 +2,10 @@
 # MVPWeatherSample
 Sample android app project using MVP architecture.
 
+# Motivation
+This app was prepared for self learning purpose.</br>
+It doesn't incorporate Dagger2 (this might change in the future).
+
 # Build instructions
 * Obtain openweathermap api key (
 [obtaining your OpenWeatherMap api key instruction](http://openweathermap.org/appid#get)
@@ -18,10 +22,6 @@ Sample android app project using MVP architecture.
 * [Location GMS](https://developers.google.com/android/reference/com/google/android/gms/location/package-summary)
 * [Picasso](http://square.github.io/picasso/)
 * [ButterKnife](http://jakewharton.github.io/butterknife/)
-
-# Motivation
-This app was prepared for self learning purpose.</br>
-It doesn't incorporate Dagger2 (this might change in the future).
 
 ## License
 
