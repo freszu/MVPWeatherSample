@@ -2,6 +2,7 @@ package pl.naniewicz.mvpweathersample.data.local.gms;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.Api;
@@ -58,12 +59,11 @@ abstract class BaseObservable<T> implements Observable.OnSubscribe<T>, Connectio
         return apiClientBuilder.build();
     }
 
+    protected abstract void onApiClientReady(GoogleApiClient googleApi, Subscriber<? super T> subscriber);
 
     protected void onUnsubscribe(GoogleApiClient apiClient) {
 
     }
-
-    protected abstract void onApiClientReady(GoogleApiClient googleApi, Subscriber<? super T> subscriber);
 
     @Override
     public void onConnected(Bundle bundle) {
@@ -76,7 +76,7 @@ abstract class BaseObservable<T> implements Observable.OnSubscribe<T>, Connectio
     }
 
     @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         if (!mSubscriber.isUnsubscribed()) {
             //mostly thrown when google mobile services are unavailable
             mSubscriber.onError(new ApiClientConnectionFailedException(connectionResult.toString()));

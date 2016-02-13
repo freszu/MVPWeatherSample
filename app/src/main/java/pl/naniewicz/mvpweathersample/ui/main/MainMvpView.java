@@ -21,4 +21,6 @@ public interface MainMvpView extends MvpView {
     void showLocationFab();
 
     void showNoLocationPermissionSnackbar();
+
+    void dismissNoLocationPermissionSnackbar();
 }

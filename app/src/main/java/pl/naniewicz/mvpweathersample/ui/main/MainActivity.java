@@ -29,7 +29,6 @@ public class MainActivity extends BaseActivity implements MainMvpView {
     private MainPresenter mMainPresenter;
 
     @Bind(R.id.toolbar) Toolbar mToolbar;
-
     @Bind(R.id.edit_text_location) EditText mEditTextLocation;
     @Bind(R.id.text_status) TextView mTextStatus;
     @Bind(R.id.image_weather_icon) ImageView mImageWeatherIcon;
@@ -39,6 +38,8 @@ public class MainActivity extends BaseActivity implements MainMvpView {
     @Bind(R.id.text_temperature_min) TextView mTextTemperatureMin;
     @Bind(R.id.text_description) TextView mTextDescription;
     @Bind(R.id.fab_gps_based_forecast) FloatingActionButton mFAB;
+
+    private Snackbar mNoLocationPermissionSnackbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +78,7 @@ public class MainActivity extends BaseActivity implements MainMvpView {
     @Override
     protected void onStop() {
         super.onStop();
-        mMainPresenter.stopGpsService();
+        mMainPresenter.stopLocationService();
     }
 
     @Override
@@ -94,11 +95,7 @@ public class MainActivity extends BaseActivity implements MainMvpView {
 
     @Override
     public void setRefreshingIndicator(boolean state) {
-        if (state) {
-            mTextStatus.setText(getString(R.string.loading));
-        } else {
-            mTextStatus.setText(null);
-        }
+        mTextStatus.setText(state ? getString(R.string.loading) : null);
     }
 
     @Override
@@ -134,14 +131,14 @@ public class MainActivity extends BaseActivity implements MainMvpView {
 
     @Override
     public void showNoLocationPermissionSnackbar() {
-        Snackbar snackbar = Snackbar.make(findViewById(R.id.coordinatorLayout),
+        mNoLocationPermissionSnackbar = Snackbar.make(findViewById(R.id.coordinatorLayout),
                 R.string.no_location_permission_warning,
                 Snackbar.LENGTH_INDEFINITE)
                 .setAction(R.string.settings,
                         onClick -> {
                             goToAppSettings();
                         });
-        snackbar.show();
+        mNoLocationPermissionSnackbar.show();
     }
 
     private void goToAppSettings() {
@@ -150,6 +147,13 @@ public class MainActivity extends BaseActivity implements MainMvpView {
                 .addCategory(Intent.CATEGORY_DEFAULT)
                 .setData(Uri.parse("package:" + getPackageName()));
         startActivity(intent);
+    }
+
+    @Override
+    public void dismissNoLocationPermissionSnackbar() {
+        if (mNoLocationPermissionSnackbar != null && mNoLocationPermissionSnackbar.isShown()) {
+            mNoLocationPermissionSnackbar.dismiss();
+        }
     }
 
 }

@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 
 import pl.naniewicz.mvpweathersample.data.DataManager;
 import pl.naniewicz.mvpweathersample.data.model.WeatherResponse;
+import pl.naniewicz.mvpweathersample.data.remote.WeatherResponseApiException;
 import pl.naniewicz.mvpweathersample.ui.base.BasePresenter;
 import pl.naniewicz.mvpweathersample.util.RxUtil;
 import rx.Observable;
@@ -55,19 +56,21 @@ public class MainPresenter extends BasePresenter<MainMvpView> {
     public void subscribeEditText(EditText editTextCity) {
         mSubscriptions.add(
                 RxTextView.textChanges(editTextCity)
-                        .debounce(DEBOUNCE_MILLISECONDS, TimeUnit.MILLISECONDS)
                         .filter(charSequence -> charSequence.length() > 0)
+                        .doOnNext(charSequence -> getMvpView().setRefreshingIndicator(true))
+                        .debounce(DEBOUNCE_MILLISECONDS, TimeUnit.MILLISECONDS)
                         .switchMap(charSequence ->
                                 mDataManager.getWeatherWithObservable(charSequence.toString())
                                         .compose(RxUtil.applySchedulers())
                                         .onErrorResumeNext(throwable -> {
-                                            getMvpView().showError(throwable.getMessage());
+                                            handleError(throwable);
                                             return Observable.empty();
                                         }))
-                        .subscribe(this::handleWeatherResponse));
+                        .subscribe(this::displayWeatherResponse));
     }
 
     public void startLocationService(Activity activity) {
+        getMvpView().dismissNoLocationPermissionSnackbar();
         if (hasLocationPermission(activity)) {
             subscribeToLocationChanges(activity);
         } else {
@@ -100,7 +103,7 @@ public class MainPresenter extends BasePresenter<MainMvpView> {
                 PackageManager.PERMISSION_GRANTED;
     }
 
-    public void stopGpsService() {
+    public void stopLocationService() {
         if (mLocationSubscription != null && !mLocationSubscription.isUnsubscribed()) {
             mLocationSubscription.unsubscribe();
         }
@@ -127,17 +130,22 @@ public class MainPresenter extends BasePresenter<MainMvpView> {
                 mLatestLocation.getLongitude())
                 .compose(RxUtil.applySchedulers())
                 .subscribe(
-                        this::handleWeatherResponse,
-                        throwable -> getMvpView().showError(throwable.getMessage())));
+                        this::displayWeatherResponse,
+                        this::handleError));
     }
 
-    private void handleWeatherResponse(WeatherResponse weatherResponse) {
-        if (weatherResponse.getCode() == 200) {
-            getMvpView().showWeather(weatherResponse);
-            getMvpView().setRefreshingIndicator(false);
+    private void displayWeatherResponse(WeatherResponse weatherResponse) {
+        getMvpView().showWeather(weatherResponse);
+        getMvpView().setRefreshingIndicator(false);
+    }
+
+    private void handleError(Throwable throwable) {
+        if (throwable instanceof WeatherResponseApiException) {
+            getMvpView().showApiError(throwable.getMessage());
         } else {
-            getMvpView().showApiError(weatherResponse.getMessage());
+            getMvpView().showError(throwable.getMessage());
         }
     }
+
 
 }

@@ -8,11 +8,12 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 
-import pl.naniewicz.mvpweathersample.data.model.WeatherResponse;
-import pl.naniewicz.mvpweathersample.data.remote.OpenWeatherMapApiManager;
 import pl.naniewicz.mvpweathersample.data.local.gms.ApiClientObservable;
 import pl.naniewicz.mvpweathersample.data.local.gms.LocationObservable;
 import pl.naniewicz.mvpweathersample.data.local.gms.PendingResultObservable;
+import pl.naniewicz.mvpweathersample.data.model.WeatherResponse;
+import pl.naniewicz.mvpweathersample.data.remote.WeatherResponseApiException;
+import pl.naniewicz.mvpweathersample.data.remote.OpenWeatherMapApiManager;
 import pl.naniewicz.mvpweathersample.util.GMSUtil;
 import rx.Observable;
 
@@ -37,11 +38,21 @@ public class DataManager {
     }
 
     public Observable<WeatherResponse> getWeatherWithObservable(String cityName) {
-        return mOpenWeatherMapApiManager.getWeatherWithObservable(cityName);
+        return mOpenWeatherMapApiManager.getWeatherWithObservable(cityName)
+                .flatMap(this::handleWeatherResponse);
     }
 
     public Observable<WeatherResponse> getWeatherWithObservable(double latitude, double longitude) {
-        return mOpenWeatherMapApiManager.getWeatherWithObservable(latitude, longitude);
+        return mOpenWeatherMapApiManager.getWeatherWithObservable(latitude, longitude)
+                .flatMap(this::handleWeatherResponse);
+    }
+
+    private Observable<WeatherResponse> handleWeatherResponse(WeatherResponse weatherResponse) {
+        if (weatherResponse.getCode() == 200) {
+            return Observable.just(weatherResponse);
+        } else {
+            return Observable.error(new WeatherResponseApiException(weatherResponse.getMessage()));
+        }
     }
 
     public Observable<Location> getDeviceLocationWithSettingsCheck(Activity callingActivity, LocationRequest locationRequest) {
