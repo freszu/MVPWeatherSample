@@ -1,12 +1,9 @@
 package pl.naniewicz.mvpweathersample.ui.main;
 
 
-import android.Manifest;
 import android.app.Activity;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.support.v4.app.ActivityCompat;
 import android.widget.EditText;
 
 import com.google.android.gms.location.LocationRequest;
@@ -28,7 +25,7 @@ import rx.subscriptions.CompositeSubscription;
  */
 public class MainPresenter extends BasePresenter<MainMvpView> {
 
-    private static final int PERMISSION_REQUEST_CODE_ACCESS_FINE_LOCATION = 1;
+    private static final int FINE_LOCATION_PERMISSION_REQUEST_CODE = 1;
 
     private static final int DEBOUNCE_MILLISECONDS = 500;
     private static final int UPDATE_INTERVAL_MILLISECONDS = 1000;
@@ -71,11 +68,10 @@ public class MainPresenter extends BasePresenter<MainMvpView> {
 
     public void startLocationService(Activity activity) {
         getMvpView().dismissNoLocationPermissionSnackbar();
-        if (hasLocationPermission(activity)) {
+        if (getMvpView().hasLocationPermission()) {
             subscribeToLocationChanges(activity);
         } else {
-            getMvpView().compatRequestPermissions(PERMISSION_REQUEST_CODE_ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_FINE_LOCATION);
+            getMvpView().compatRequestFineLocationPermission(FINE_LOCATION_PERMISSION_REQUEST_CODE);
         }
     }
 
@@ -98,11 +94,6 @@ public class MainPresenter extends BasePresenter<MainMvpView> {
                 .setPriority(LOCATION_ACCURACY);
     }
 
-    private boolean hasLocationPermission(Context context) {
-        return ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
-                PackageManager.PERMISSION_GRANTED;
-    }
-
     public void stopLocationService() {
         if (mLocationSubscription != null && !mLocationSubscription.isUnsubscribed()) {
             mLocationSubscription.unsubscribe();
@@ -111,7 +102,7 @@ public class MainPresenter extends BasePresenter<MainMvpView> {
 
     public void handlePermissionResult(Activity activity, int requestCode, int[] grantResults) {
         switch (requestCode) {
-            case PERMISSION_REQUEST_CODE_ACCESS_FINE_LOCATION: {
+            case FINE_LOCATION_PERMISSION_REQUEST_CODE: {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     subscribeToLocationChanges(activity);

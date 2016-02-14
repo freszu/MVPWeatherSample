@@ -1,6 +1,8 @@
 package pl.naniewicz.mvpweathersample.ui.main;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -64,8 +66,10 @@ public class MainActivity extends BaseActivity implements MainMvpView {
 
 
     @Override
-    public void compatRequestPermissions(int requestCode, String... permissions) {
-        ActivityCompat.requestPermissions(this, permissions, requestCode);
+    public void compatRequestFineLocationPermission(int requestCode) {
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                requestCode);
     }
 
     @Override
@@ -154,6 +158,12 @@ public class MainActivity extends BaseActivity implements MainMvpView {
         if (mNoLocationPermissionSnackbar != null && mNoLocationPermissionSnackbar.isShown()) {
             mNoLocationPermissionSnackbar.dismiss();
         }
+    }
+
+    @Override
+    public boolean hasLocationPermission() {
+        return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED;
     }
 
 }

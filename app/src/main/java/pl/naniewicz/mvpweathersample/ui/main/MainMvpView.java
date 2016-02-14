@@ -8,7 +8,9 @@ import pl.naniewicz.mvpweathersample.ui.base.MvpView;
  */
 public interface MainMvpView extends MvpView {
 
-    void compatRequestPermissions(int requestCode, String... permissions);
+    void compatRequestFineLocationPermission(int requestCode);
+
+    boolean hasLocationPermission();
 
     void setRefreshingIndicator(boolean state);
 
