@@ -3,8 +3,7 @@
 Sample android app project using MVP architecture.
 
 # Motivation
-This app was prepared for self learning purpose.</br>
-It doesn't incorporate Dagger2 (this might change in the future).
+This app was prepared for self learning purpose.
 
 # Build instructions
 * Obtain openweathermap api key (
@@ -16,6 +15,7 @@ It doesn't incorporate Dagger2 (this might change in the future).
 
 # Used libraries
 * [Retrofit](http://square.github.io/retrofit/)
+* [Dagger 2](http://google.github.io/dagger/)
 * [RxJava](https://github.com/ReactiveX/RxJava)
 * [RxAndroid](https://github.com/ReactiveX/RxAndroid)
 * [RxBinding](https://github.com/JakeWharton/RxBinding)
