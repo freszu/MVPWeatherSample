@@ -2,6 +2,7 @@ package pl.naniewicz.mvpweathersample.ui.main;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -16,7 +17,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.api.Status;
 import com.squareup.picasso.Picasso;
+
+import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.OnClick;
@@ -28,7 +34,10 @@ import pl.naniewicz.mvpweathersample.util.StringFormatterUtil;
 
 public class MainActivity extends BaseActivity implements MainMvpView {
 
-    private MainPresenter mMainPresenter;
+    private static final int CHECK_LOCATION_SETTINGS_REQUEST_CODE = 1;
+    private static final int FINE_LOCATION_PERMISSION_REQUEST_CODE = 2;
+
+    @Inject MainPresenter mMainPresenter;
 
     @Bind(R.id.toolbar) Toolbar mToolbar;
     @Bind(R.id.edit_text_location) EditText mEditTextLocation;
@@ -40,43 +49,43 @@ public class MainActivity extends BaseActivity implements MainMvpView {
     @Bind(R.id.text_temperature_min) TextView mTextTemperatureMin;
     @Bind(R.id.text_description) TextView mTextDescription;
     @Bind(R.id.fab_gps_based_forecast) FloatingActionButton mFAB;
+    private Snackbar mWarningSnackbar;
 
-    private Snackbar mNoLocationPermissionSnackbar;
+    private boolean mIsLocationSettingsStatusForResultCalled = false;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setSupportActionBar(mToolbar);
-        setupMainPresenter();
-        mMainPresenter.subscribeEditText(mEditTextLocation);
-    }
-
-    private void setupMainPresenter() {
-        mMainPresenter = new MainPresenter();
+        getActivityComponent().inject(this);
         mMainPresenter.attachView(this);
+        mMainPresenter.subscribeEditText(mEditTextLocation);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         mFAB.hide();
-        mMainPresenter.startLocationService(this);
-    }
-
-
-    @Override
-    public void compatRequestFineLocationPermission(int requestCode) {
-        ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                requestCode);
+        mMainPresenter.startLocationService();
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
-        mMainPresenter.handlePermissionResult(this, requestCode, grantResults);
+        if (requestCode == FINE_LOCATION_PERMISSION_REQUEST_CODE &&
+                grantResults.length > 0) {
+            mMainPresenter.handleFineLocationPermissionResult(grantResults[0]);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == CHECK_LOCATION_SETTINGS_REQUEST_CODE) {
+            mIsLocationSettingsStatusForResultCalled = false;
+            mMainPresenter.handleLocationSettingsDialogResult(resultCode);
+        }
     }
 
     @Override
@@ -95,6 +104,14 @@ public class MainActivity extends BaseActivity implements MainMvpView {
     @OnClick(R.id.fab_gps_based_forecast)
     public void onFabGpsClick() {
         mMainPresenter.loadGPSBasedForecast();
+    }
+
+    /* MVP Methods */
+
+    @Override
+    public boolean hasFineLocationPermission() {
+        return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED;
     }
 
     @Override
@@ -134,15 +151,19 @@ public class MainActivity extends BaseActivity implements MainMvpView {
     }
 
     @Override
-    public void showNoLocationPermissionSnackbar() {
-        mNoLocationPermissionSnackbar = Snackbar.make(findViewById(R.id.coordinatorLayout),
-                R.string.no_location_permission_warning,
+    public void compatRequestFineLocationPermission() {
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                FINE_LOCATION_PERMISSION_REQUEST_CODE);
+    }
+
+    @Override
+    public void showNoFineLocationPermissionWarning() {
+        mWarningSnackbar = Snackbar.make(findViewById(R.id.coordinatorLayout),
+                R.string.warning_no_fine_location_permission,
                 Snackbar.LENGTH_INDEFINITE)
-                .setAction(R.string.settings,
-                        onClick -> {
-                            goToAppSettings();
-                        });
-        mNoLocationPermissionSnackbar.show();
+                .setAction(R.string.settings, v -> goToAppSettings());
+        mWarningSnackbar.show();
     }
 
     private void goToAppSettings() {
@@ -154,16 +175,47 @@ public class MainActivity extends BaseActivity implements MainMvpView {
     }
 
     @Override
-    public void dismissNoLocationPermissionSnackbar() {
-        if (mNoLocationPermissionSnackbar != null && mNoLocationPermissionSnackbar.isShown()) {
-            mNoLocationPermissionSnackbar.dismiss();
+    public void dismissWarning() {
+        if (mWarningSnackbar != null && mWarningSnackbar.isShown()) {
+            mWarningSnackbar.dismiss();
         }
     }
 
     @Override
-    public boolean hasLocationPermission() {
-        return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) ==
-                PackageManager.PERMISSION_GRANTED;
+    public void onUserResolvableLocationSettings(Status status) {
+        try {
+            status.startResolutionForResult(this, CHECK_LOCATION_SETTINGS_REQUEST_CODE);
+            mIsLocationSettingsStatusForResultCalled = true;
+        } catch (IntentSender.SendIntentException e) {
+            e.printStackTrace();
+        }
     }
 
+    @Override
+    public void showLocationSettingsWarning() {
+        mWarningSnackbar = Snackbar.make(findViewById(R.id.coordinatorLayout),
+                R.string.warning_inadequate_location_settings,
+                Snackbar.LENGTH_INDEFINITE)
+                .setAction(R.string.change_settings, v -> mMainPresenter.checkLocationSettings());
+        mWarningSnackbar.show();
+    }
+
+    @Override
+    public void onGmsConnectionResultResolutionRequired(ConnectionResult connectionResult) {
+        try {
+            connectionResult.startResolutionForResult(this, -1);
+        } catch (IntentSender.SendIntentException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onGmsConnectionResultNoResolution(int errorCode) {
+        GoogleApiAvailability.getInstance().getErrorDialog(this, errorCode, 0).show();
+    }
+
+    @Override
+    public boolean isLocationSettingsStatusDialogCalled() {
+        return mIsLocationSettingsStatusForResultCalled;
+    }
 }

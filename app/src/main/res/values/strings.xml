@@ -3,6 +3,8 @@
     <string name="hint_city">Insert city name here</string>
     <string name="weather_icon">weather icon</string>
     <string name="loading">loading…</string>
-    <string name="no_location_permission_warning">Location based broadcast can\'t function without location permission</string>
+    <string name="warning_no_fine_location_permission">Location based broadcast can\'t function without location permission.</string>
     <string name="settings">Settings</string>
+    <string name="change_settings">Change</string>
+    <string name="warning_inadequate_location_settings">Inadequate location settings.</string>
 </resources>
