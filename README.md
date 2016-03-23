@@ -14,6 +14,7 @@ This app was prepared for self learning purpose.
 * Build project
 
 # Used libraries
+* [Retrolambda](https://github.com/evant/gradle-retrolambda)
 * [Retrofit](http://square.github.io/retrofit/)
 * [Dagger 2](http://google.github.io/dagger/)
 * [RxJava](https://github.com/ReactiveX/RxJava)
